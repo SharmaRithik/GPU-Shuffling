@@ -2,6 +2,7 @@ import ray
 import time
 import os
 import numpy as np
+from gpu_shuffle import gpu_shuffle  # Import the gpu_shuffle function from gpu_shuffle.py
 
 def verify_shuffling(original_data, shuffled_data, method="GPU"):
     """
@@ -24,7 +25,6 @@ def verify_shuffling(original_data, shuffled_data, method="GPU"):
 
     print(f"Verification ({method}): {'Passed' if is_correct else 'Failed'}")
 
-    # Only bother checking shuffle percentage if under certain length
     if len(original_data) < 1000000:
         num_shuffled = 0
         for i in range(len(original_data)):
@@ -74,7 +74,6 @@ def main():
     """
     Main function to test GPU and Ray shuffling algorithms with different data sizes.
     """
-    #sizes = [100000, 500000, 1000000, 10000000]
     sizes = [100000, 500000, 1000000, 10000000]
     element_size_bytes = np.dtype(np.int64).itemsize  # Size of each element in bytes (assuming int64)
     results = []
@@ -88,9 +87,10 @@ def main():
         # GPU Shuffle
         os.environ['RAY_DATA_GPU_SHUFFLE'] = '1'
         ray.init()
-        dataset = ray.data.from_numpy(original_data.copy())
-        gpu_time, shuffled_data = ray_random_shuffle(dataset, original_data)
-        verify_shuffling(original_data, shuffled_data, "GPU random_shuffle")
+        gpu_start_time = time.perf_counter()
+        shuffled_data = gpu_shuffle(original_data.copy())
+        gpu_time = time.perf_counter() - gpu_start_time
+        verify_shuffling(original_data, shuffled_data, "GPU custom shuffle")
         ray.shutdown()
 
         # Ray Shuffle
