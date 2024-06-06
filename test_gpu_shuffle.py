@@ -2,7 +2,7 @@ import ray
 import time
 import os
 import numpy as np
-from gpu_shuffle import gpu_shuffle  # Import the gpu_shuffle function from gpu_shuffle.py
+from gpu_shuffle import gpu_topological_shuffle  # Import the gpu_topological_shuffle function from gpu_shuffle.py
 
 def verify_shuffling(original_data, shuffled_data, method="GPU"):
     """
@@ -84,13 +84,13 @@ def main():
         print("\nTesting size:", sizes[s])
         original_data = np.arange(sizes[s])
 
-        # GPU Shuffle
+        # GPU Topological Shuffle
         os.environ['RAY_DATA_GPU_SHUFFLE'] = '1'
         ray.init()
         gpu_start_time = time.perf_counter()
-        shuffled_data = gpu_shuffle(original_data.copy())
+        shuffled_data = gpu_topological_shuffle(original_data.copy())
         gpu_time = time.perf_counter() - gpu_start_time
-        verify_shuffling(original_data, shuffled_data, "GPU custom shuffle")
+        verify_shuffling(original_data, shuffled_data, "GPU topological shuffle")
         ray.shutdown()
 
         # Ray Shuffle
