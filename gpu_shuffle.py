@@ -22,24 +22,6 @@ def fisher_yates_gpu(arr, chk_size, rng_states):
         j = int(xoroshiro128p_uniform_float32(rng_states, i) * (i - chk_start) + chk_start)
         arr[i], arr[j] = arr[j], arr[i]
 
-def in_place_shuffled_merge_cpu(arr, start, mid, end):
-    i = start
-    j = mid
-    while True:
-        if random.randint(0, 1):
-            if i == j:
-                break
-        else:
-            if j == end:
-                break
-            arr[i], arr[j] = arr[j], arr[i]
-            j += 1
-        i += 1
-    while i < end:
-        m = random.randint(start, i)
-        arr[i], arr[m] = arr[m], arr[i]
-        i += 1
-
 @cuda.jit(cache=True, opt=True)
 def in_place_shuffled_merge_gpu(arr, n, chk_size, rng_states):
     idx = cuda.grid(1)

@@ -111,8 +111,6 @@ def main():
     for size, data_size_human_readable, gpu_time, ray_time in results:
         print("{:<10} {:<15} {:<15.6f} {:<15.6f}".format(size, data_size_human_readable, gpu_time, ray_time))
 
-    ray.shutdown()  # Shut down Ray
-
 if __name__ == "__main__":
     main()
 

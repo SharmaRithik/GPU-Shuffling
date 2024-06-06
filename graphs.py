@@ -38,11 +38,27 @@ with plt.style.context('science'):
     ax.legend()
 
     plt.savefig("perf-comparison.png", dpi=300)
-    #plt.show()
+    plt.show()
 
 
 with plt.style.context('science'):
+    times = {
+        'Remainder' : np.array(gpu_remainder_times),
+        'Merge procedure' : np.array(merge_times),
+        'Fisher-Yates shuffle' : np.array(fisher_yates_times),
+        'Host-device copy' : np.array(copy_times)
+    }
+    bottom = np.zeros(4)
+    width = 0.5
+    fig, ax = plt.subplots(layout='constrained', figsize=(5, 4))
+    for label, data in times.items():
+        p = ax.bar([str(s) for s in sizes], data, width, label=label, bottom=bottom)
+        bottom += data
+
+    ax.set_xlabel('Data sizes (number of elements)')
+    ax.set_ylabel('Time to finish (s)')
+    ax.set_yscale('log')
+    ax.legend()
     
-    
-    plt.savefig("perf-breakdown.png", dpi=300)
+    plt.savefig("gpu-perf-breakdown.png", dpi=300)
     plt.show()
